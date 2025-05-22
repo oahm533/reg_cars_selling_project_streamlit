@@ -195,9 +195,7 @@ y_pred = model.predict(X_test)
 r2 = r2_score(y_test, y_pred)
 st.write(f"R² Score: {r2:.2f}")
 
-# حساب Mean Squared Error
-mse = mean_squared_error(y_test, y_pred)
-st.write(f"Mean Squared Error: {mse:.2f}")
+
 
 
 
