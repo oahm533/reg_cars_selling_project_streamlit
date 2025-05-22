@@ -193,7 +193,7 @@ st.subheader(f"₹ {predicted_price:,.0f}")
 y_pred = model.predict(X_test)
 # حساب R² (مؤشر القوة التفسيرية)
 r2 = r2_score(y_test, y_pred)
-st.write(f"R² Score: {r2:.2f}")
+st.write(f"هذه نسبة توقع سعر السيارة: {r2:.2f}")
 
 
 
