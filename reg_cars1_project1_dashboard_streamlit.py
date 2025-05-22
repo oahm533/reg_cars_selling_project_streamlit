@@ -216,10 +216,10 @@ st.dataframe(fuel_avg_prices.reset_index().rename(columns={"fuel": "نوع ال�
 # Bar Plot 
 fig1, ax = plt.subplots(figsize=(10, 6))
 sns.barplot(x=fuel_avg_prices.index, y=fuel_avg_prices.values, palette="viridis", ax=ax)  # استخدام اللون الفخم
-plt.xticks(rotation=0, fontsize=12)
-
+plt.xlabel('fuel', fontsize=14, weight='bold', color='darkblue')
 # عرض الرسم البياني
 st.pyplot(fig1)
+
 
 
 # Distribution of Cars by Brand countplot
