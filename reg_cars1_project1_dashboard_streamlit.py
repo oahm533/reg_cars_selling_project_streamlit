@@ -217,6 +217,8 @@ st.dataframe(fuel_avg_prices.reset_index().rename(columns={"fuel": "نوع ال�
 fig1, ax = plt.subplots(figsize=(10, 6))
 sns.barplot(x=fuel_avg_prices.index, y=fuel_avg_prices.values, palette="viridis", ax=ax)  # استخدام اللون الفخم
 plt.xlabel('fuel', fontsize=14, weight='bold', color='darkblue')
+plt.xticks(rotation=0, fontsize=12)
+
 # عرض الرسم البياني
 st.pyplot(fig1)
 
@@ -285,7 +287,7 @@ sns.barplot(x='fuel', y='selling_price_INR', hue='transmission', data=df_grouped
 plt.title('Average Selling Price by Fuel Type and Transmission Type', fontsize=16, weight='bold', color='darkblue')
 plt.xlabel('Fuel Type', fontsize=14)
 plt.ylabel('Average Selling Price', fontsize=14)
-plt.xticks(rotation=45, fontsize=12)
+plt.xticks(rotation=0, fontsize=12)
 plt.legend(title='Transmission Type', title_fontsize=12, fontsize=12, loc='upper left')
 plt.tight_layout()
 plt.show()
@@ -307,7 +309,7 @@ plt.bar(df_car_numeric_analysis['seller_type'] ,df_car_numeric_analysis['selling
 plt.title('seller_type', fontsize=18, weight='bold', color='darkblue')
 plt.xlabel('seller_type', fontsize=14, color='darkblue')
 plt.ylabel('selling_price', fontsize=14, color='darkblue')
-plt.xticks(rotation=66, fontsize=12, color='black')
+plt.xticks(rotation=66, fontsize=0, color='black')
 plt.grid(True, axis='y', linestyle='--', alpha=0.6)
 plt.show()
 st.pyplot(fig10)
