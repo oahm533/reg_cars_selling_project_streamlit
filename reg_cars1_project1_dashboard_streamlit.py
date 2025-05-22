@@ -246,6 +246,7 @@ transmission_avg_price.plot(kind='pie' ,autopct = "%.2f%%"  )
 plt.title('Average Selling Price Distribution by Transmission Type', fontsize=16, weight='bold', color='darkblue')
 plt.ylabel('')
 plt.legend(title='Transmission Type', loc='upper left', fontsize=12, title_fontsize=14)
+plt.xticks(rotation=66)
 st.pyplot(fig3)
 
 fig4 = plt.figure(figsize=(12,8))
