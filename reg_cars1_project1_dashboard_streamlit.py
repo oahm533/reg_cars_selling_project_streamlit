@@ -15,7 +15,7 @@ from sklearn.neighbors import LocalOutlierFactor
 st.sidebar.image('cars.png')
 
 #-----header-------
-st.sidebar.image('cars2.png')
+st.header.image('cars2.png')
 
 st.sidebar.title("🧮 إدخال البيانات")
 
