@@ -13,11 +13,11 @@ from sklearn.neighbors import LocalOutlierFactor
 
 #-----sidebar-------
 st.sidebar.image('cars.png')
+st.sidebar.title("🧮 إدخال البيانات")
 
 #-----header-------
-st.header.image('cars2.png')
+st.image('cars2.png')
 
-st.sidebar.title("🧮 إدخال البيانات")
 
 # ثابت: قائمة الماركات
 
