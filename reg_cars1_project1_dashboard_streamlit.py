@@ -39,7 +39,6 @@ max_power = st.sidebar.number_input("⚡ أقصى قوة (حصان)", min_value=
 seats = st.sidebar.selectbox("💺 عدد المقاعد", [2, 4, 5, 6, 7, 8, 9, 10], key="seats")
 torque = st.sidebar.number_input("🌀 عزم الدوران (Nm)", min_value=20.0, max_value=1000.0, value=113.8, key="torque")
 
-# تعليمات بجانب الحقول
 st.sidebar.markdown("### تعليمات الإدخال:")
 st.sidebar.markdown("""
 - اختر الماركة من القائمة المنسدلة.
@@ -57,7 +56,6 @@ st.sidebar.markdown("""
 if not (year and km_driven and fuel and seller_type and transmission and owner and mileage and engine and max_power and torque and seats and brand):
     st.warning("⚠️ تأكد من إدخال جميع الحقول بشكل صحيح.")
 
-# إدخال المستخدم كـ DataFrame
 input_data = pd.DataFrame({
     "year": [year],
     "km_driven": [km_driven],
@@ -83,7 +81,6 @@ df_car = pd.read_csv("reg_cars_selling.csv")
 df_car.drop_duplicates(inplace=True)
 df_car = df_car.dropna()
 
-# تنظيف وتحويل الأعمدة الرقمية النصية بأمان
 df_car['max_power'] = df_car['max_power'].astype(str).str.replace(r' bhp$', '', regex=True).astype(float)
 
 df_car['mileage'] = df_car['mileage'].astype(str).str.replace(r' kmpl$', '', regex=True)
@@ -92,14 +89,13 @@ df_car['mileage'] = df_car['mileage'].str.replace(r' km/kg$', '', regex=True).as
 df_car['engine'] = df_car['engine'].astype(str).str.replace(r' CC$', '', regex=True)
 df_car['engine'] = df_car['engine'].str.replace(r'CC', '', regex=True).astype(float)
 
-# استخراج الماركة بأمان سواء كان عمود name موجوداً أو محذوفاً مسبقاً
+# استخراج الماركة وحذف عمود name بما يتوافق مع Pandas 3.0
 if 'name' in df_car.columns:
-    df_car['brand'] = df_car['name'].apply(lambda x: str(x).split()[0])
-    df_car.drop(columns=['name'], axis=1, inplace=True)
+    df_car['brand'] = df_car['name'].apply(lambda x: str(x).split())
+    df_car.drop(columns=['name'], inplace=True)
 
 df_car['torque'] = df_car['torque'].astype(str)
 
-# معالجة عمود العزم torque
 def extract_torque(value):
     if pd.isna(value):
         return None
@@ -107,8 +103,8 @@ def extract_torque(value):
     matches = re.findall(r'([\d\.]+)\s*(nm|kgm)?', value, re.IGNORECASE)
     torque_values = []
     for match in matches:
-        torque_value = float(match[0])
-        unit = match[1].lower() if match[1] else 'nm'
+        torque_value = float(match)
+        unit = match.lower() if match else 'nm'
         if unit == "kgm":
             torque_value *= 9.80665
         torque_values.append(torque_value)
@@ -121,9 +117,8 @@ df_car = df_car.dropna()
 
 if 'selling_price' in df_car.columns:
     df_car['selling_price_INR'] = df_car['selling_price']
-    df_car.drop('selling_price', axis=1, inplace=True)
+    df_car.drop(columns=['selling_price'], inplace=True)
 
-# نسخة للتحليل البصري قبل الترميز
 df_car_numeric_analysis = df_car.copy()
 
 # ترميز الأعمدة النصية
@@ -135,9 +130,8 @@ for col in categorical_columns:
     encoder = LabelEncoder()
     df_car[col] = encoder.fit_transform(df_car[col].astype(str))
     input_data_encoded[col] = input_data_encoded[col].fillna("Unknown").astype(str)
-    # التعامل الآمن مع أي قيمة غير موجودة في بيانات التدريب
     input_data_encoded[col] = input_data_encoded[col].apply(
-        lambda x: encoder.transform([x])[0] if x in encoder.classes_ else 0
+        lambda x: encoder.transform([x]) if x in encoder.classes_ else 0
     )
 
 # إزالة القيم الشاذة باستخدام Local Outlier Factor
@@ -148,10 +142,10 @@ df_car = df_car[df_car['outlier_labels'] != -1]
 df_car.drop(columns=['outlier_labels'], inplace=True)
 
 # تقسيم البيانات
-X = df_car.drop(['selling_price_INR'], axis=1)
+X = df_car.drop(columns=['selling_price_INR'])
 y = df_car['selling_price_INR']
 
-# توحيد ترتيب أعمدة المدخلات مع بيانات التدريب لمنع خطأ ValueError
+# توحيد ترتيب أعمدة المدخلات مع بيانات التدريب
 input_data_encoded = input_data_encoded[X.columns]
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -161,7 +155,7 @@ model = RandomForestRegressor(random_state=42)
 model.fit(X_train, y_train)
 
 # التنبؤ بالسعر بناءً على المدخلات
-predicted_price = model.predict(input_data_encoded)[0]
+predicted_price = model.predict(input_data_encoded)
 
 # عرض السعر المتوقع ومقاييس الدقة
 st.title("💰 السعر المتوقع بناءً على المدخلات:")
