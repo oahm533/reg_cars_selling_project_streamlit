@@ -18,25 +18,25 @@ st.sidebar.title("🧮 إدخال البيانات")
 st.image('cars2.png')
 
 # قائمة الماركات
-brands_list = [
+brands_list = (
     'Maruti', 'Skoda', 'Honda', 'Hyundai', 'Toyota', 'Ford', 'Renault',
     'Mahindra', 'Tata', 'Chevrolet', 'Datsun', 'Jeep', 'Mercedes-Benz',
     'Mitsubishi', 'Audi', 'Volkswagen', 'BMW', 'Nissan', 'Lexus',
     'Jaguar', 'Land', 'MG', 'Volvo', 'Daewoo', 'Kia', 'Fiat', 'Force',
     'Ambassador', 'Ashok', 'Isuzu', 'Opel'
-]
+)
 
 brand = st.sidebar.selectbox("🏷️ اختر الماركة", brands_list, key="brand")
 year = st.sidebar.number_input("📅 سنة الصنع", min_value=1990, max_value=2025, value=2015, key="year")
 km_driven = st.sidebar.number_input("🚗 عدد الكيلومترات المقطوعة", min_value=0, value=50000, step=1000, key="km_driven")
-fuel = st.sidebar.selectbox("⛽ نوع الوقود", ["Petrol", "Diesel", "CNG", "LPG", "Electric"], key="fuel")
-seller_type = st.sidebar.selectbox("🧍 نوع البائع", ["Individual", "Dealer", "Trustmark Dealer"], key="seller_type")
-transmission = st.sidebar.selectbox("⚙️ ناقل الحركة", ["Manual", "Automatic"], key="transmission")
-owner = st.sidebar.selectbox("👥 عدد المالكين السابقين", ["First Owner", "Second Owner", "Third Owner", "Fourth & Above Owner", "Test Drive Car"], key="owner")
+fuel = st.sidebar.selectbox("⛽ نوع الوقود", ("Petrol", "Diesel", "CNG", "LPG", "Electric"), key="fuel")
+seller_type = st.sidebar.selectbox("🧍 نوع البائع", ("Individual", "Dealer", "Trustmark Dealer"), key="seller_type")
+transmission = st.sidebar.selectbox("⚙️ ناقل الحركة", ("Manual", "Automatic"), key="transmission")
+owner = st.sidebar.selectbox("👥 عدد المالكين السابقين", ("First Owner", "Second Owner", "Third Owner", "Fourth & Above Owner", "Test Drive Car"), key="owner")
 mileage = st.sidebar.number_input("📏 المسافة المقطوعة (كم/لتر)", min_value=0.0, value=18.0, key="mileage")
 engine = st.sidebar.number_input("🧠 سعة المحرك (cc)", min_value=500, max_value=6000, value=1500, key="engine")
 max_power = st.sidebar.number_input("⚡ أقصى قوة (حصان)", min_value=30.0, value=100.0, key="max_power")
-seats = st.sidebar.selectbox("💺 عدد المقاعد", [2, 4, 5, 6, 7, 8, 9, 10], key="seats")
+seats = st.sidebar.selectbox("💺 عدد المقاعد", (2, 4, 5, 6, 7, 8, 9, 10), key="seats")
 torque = st.sidebar.number_input("🌀 عزم الدوران (Nm)", min_value=20.0, max_value=1000.0, value=113.8, key="torque")
 
 st.sidebar.markdown("### تعليمات الإدخال:")
@@ -57,18 +57,18 @@ if not (year and km_driven and fuel and seller_type and transmission and owner a
     st.warning("⚠️ تأكد من إدخال جميع الحقول بشكل صحيح.")
 
 input_data = pd.DataFrame({
-    "year": [year],
-    "km_driven": [km_driven],
-    "fuel": [fuel],
-    "seller_type": [seller_type],
-    "transmission": [transmission],
-    "owner": [owner],
-    "mileage": [mileage],
-    "engine": [engine],
-    "max_power": [max_power],
-    "torque": [torque],
-    "seats": [seats],
-    "brand": [brand]
+    "year": (year,),
+    "km_driven": (km_driven,),
+    "fuel": (fuel,),
+    "seller_type": (seller_type,),
+    "transmission": (transmission,),
+    "owner": (owner,),
+    "mileage": (mileage,),
+    "engine": (engine,),
+    "max_power": (max_power,),
+    "torque": (torque,),
+    "seats": (seats,),
+    "brand": (brand,)
 })
 
 st.write("🔢 المدخلات التي اخترتها:")
@@ -91,8 +91,8 @@ df_car['engine'] = df_car['engine'].str.replace(r'CC', '', regex=True).astype(fl
 
 # استخراج الماركة وحذف عمود name بما يتوافق مع Pandas 3.0
 if 'name' in df_car.columns:
-    df_car['brand'] = df_car['name'].apply(lambda x: str(x).split())
-    df_car.drop(columns=['name'], inplace=True)
+    df_car['brand'] = df_car['name'].apply(lambda x: str(x).split().pop(0))
+    df_car.drop(columns='name', inplace=True)
 
 df_car['torque'] = df_car['torque'].astype(str)
 
@@ -101,10 +101,10 @@ def extract_torque(value):
         return None
     value = str(value).lower().strip()
     matches = re.findall(r'([\d\.]+)\s*(nm|kgm)?', value, re.IGNORECASE)
-    torque_values = []
-    for match in matches:
-        torque_value = float(match)
-        unit = match.lower() if match else 'nm'
+    torque_values = list()
+    for val_str, unit_str in matches:
+        torque_value = float(val_str)
+        unit = unit_str.lower() if unit_str else 'nm'
         if unit == "kgm":
             torque_value *= 9.80665
         torque_values.append(torque_value)
@@ -117,12 +117,12 @@ df_car = df_car.dropna()
 
 if 'selling_price' in df_car.columns:
     df_car['selling_price_INR'] = df_car['selling_price']
-    df_car.drop(columns=['selling_price'], inplace=True)
+    df_car.drop(columns='selling_price', inplace=True)
 
 df_car_numeric_analysis = df_car.copy()
 
 # ترميز الأعمدة النصية
-categorical_columns = ['fuel', 'seller_type', 'transmission', 'owner', 'brand']
+categorical_columns = list(('fuel', 'seller_type', 'transmission', 'owner', 'brand'))
 df_car[categorical_columns] = df_car[categorical_columns].fillna("Unknown")
 
 input_data_encoded = input_data.copy()
@@ -131,7 +131,7 @@ for col in categorical_columns:
     df_car[col] = encoder.fit_transform(df_car[col].astype(str))
     input_data_encoded[col] = input_data_encoded[col].fillna("Unknown").astype(str)
     input_data_encoded[col] = input_data_encoded[col].apply(
-        lambda x: encoder.transform([x]) if x in encoder.classes_ else 0
+        lambda x: encoder.transform((x,)).item() if x in encoder.classes_ else 0
     )
 
 # إزالة القيم الشاذة باستخدام Local Outlier Factor
@@ -139,10 +139,10 @@ lof = LocalOutlierFactor()
 outlier_labels = lof.fit_predict(df_car)
 df_car['outlier_labels'] = outlier_labels
 df_car = df_car[df_car['outlier_labels'] != -1]
-df_car.drop(columns=['outlier_labels'], inplace=True)
+df_car.drop(columns='outlier_labels', inplace=True)
 
 # تقسيم البيانات
-X = df_car.drop(columns=['selling_price_INR'])
+X = df_car.drop(columns='selling_price_INR')
 y = df_car['selling_price_INR']
 
 # توحيد ترتيب أعمدة المدخلات مع بيانات التدريب
@@ -155,7 +155,7 @@ model = RandomForestRegressor(random_state=42)
 model.fit(X_train, y_train)
 
 # التنبؤ بالسعر بناءً على المدخلات
-predicted_price = model.predict(input_data_encoded)
+predicted_price = model.predict(input_data_encoded).item()
 
 # عرض السعر المتوقع ومقاييس الدقة
 st.title("💰 السعر المتوقع بناءً على المدخلات:")
